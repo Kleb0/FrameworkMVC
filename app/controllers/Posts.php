@@ -11,8 +11,7 @@ class Posts extends AbstractController   {
 
 
         //  Instanciation du model post pour récupérer les données de la BDD concernant les posts 
-        $this->postModel = $this->model('Post');
- 
+        $this->postModel = $this->model('Post'); 
     }
     public function index(){
         // On appel la méthode getPosts du model Post pour récupérer les posts
@@ -127,12 +126,20 @@ class Posts extends AbstractController   {
     
           // Get existing post from model
           $post = $this->postModel->getPostById($id);
+
+          if(!$post)
+          {
+            flash('flashFailure', 'Post introuvable,' , 'alert alert-danger');
+            redirect('posts/index');
+            return;
+          }
           
           // Check for owner
           if($post->id_user != $_SESSION['user_id']){
             redirect('posts/index');
           }
-  
+
+          //delete the post  
           if($this->postModel->deletePost($id)){
             flash('flashAdd', 'Le post a bien été supprimé');
             redirect('posts/index');
