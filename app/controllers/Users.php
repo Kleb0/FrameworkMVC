@@ -35,12 +35,17 @@ class Users extends AbstractController {
             $username = htmlspecialchars($_POST['username']);
             $email = htmlspecialchars($_POST['email']);
             $password = htmlspecialchars($_POST['password']);
+            //par défaut et pour les besoins du projet on set le rôle sur 2, l'administrateur pourra modifier les rôles des utilisateurs pl
+            $role_id = 2;
+            $role_name = 'administrateur';
             
             $pwdhash = password_hash($password, PASSWORD_DEFAULT);
             if ($this->userModel->register([
                 'nom'=> $username,
                 'email'=> $email,
-                'password'=> $pwdhash
+                'password'=> $pwdhash,
+                'role'=> $role_id,
+                'role_name' => $role_name
                 ])) {
                     redirect('users/login');    
                 } else {
@@ -74,7 +79,7 @@ class Users extends AbstractController {
                 flash('flashConfirm2', 'Les mots de passe ne sont pas identiques','alert alert-danger');
             } 
             if (empty($_SESSION['flashEmail']) && empty($_SESSION['flashPassword']) && empty($_SESSION['flashConfirm2'])) {   
-                $_SESSION['user_mail'] = $userExist -> email;
+                $_SESSION['email'] = $userExist -> email;
                 $_SESSION['user_id'] = $userExist -> id;
                 $_SESSION['username'] = $userExist -> nom;
                 redirect('posts/index');

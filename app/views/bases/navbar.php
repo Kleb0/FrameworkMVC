@@ -16,7 +16,13 @@
           </li>
 <?php if(isLoggedIn()){ ?>
           <li class="nav-item">
-            <a class="nav-link" href="<?php echo URLROOT; ?>/posts/index">Les posts</a>
+            <a class="nav-link" href="<?php echo URLROOT; ?>/posts/index">Les posts</a>            
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?php echo URLROOT; ?>/articlesCuration/index">Les articles à vérifier</a>
+          </li>
+          <li class="nav-item">
+            <a class ="nav-link"href="<?php echo URLROOT; ?>/usersManagement/index">Gestion des utilisateurs</a>
           </li>
 <?php } ?>
         </ul>
