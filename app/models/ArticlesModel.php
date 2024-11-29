@@ -29,6 +29,18 @@ class ArticlesModel {
         return $this->db->execute();
     }
 
+    //Transfère l'article dans la table articles_to_curated
+    
+    public function transferToCuration($articleId, $userId) {
+        $this->db->query('INSERT INTO articles_to_be_curated (article_id, submitted_by, submission_date, status) 
+                           VALUES (:article_id, :submitted_by, :submission_date, :status)');
+        $this->db->bind(':article_id', $articleId);
+        $this->db->bind(':submitted_by', $userId);
+        $this->db->bind(':submission_date', date('Y-m-d H:i:s'));
+        $this->db->bind(':status', 'pending'); // Statut par défaut
+        return $this->db->execute(); 
+    }
+
     // Récupère tous les articles
     public function getAllArticles() {
         $this->db->query('SELECT * FROM articles ORDER BY publication_date DESC');

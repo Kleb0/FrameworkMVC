@@ -61,6 +61,11 @@ class Articles extends AbstractController {
             ];
     
             if ($this->articleModel->saveArticle($data)) {
+
+                // Transfère l'article dans la table articles_to_be_curated
+                $this->articleModel->transferToCuration($nextArticleId, $_SESSION['user_id']);
+
+                
                 flash('article_message', 'Article publié avec succès', 'alert alert-success');
                 redirect('articles/index');
             } else {
