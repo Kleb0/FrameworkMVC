@@ -82,6 +82,7 @@ class Users extends AbstractController {
                 $_SESSION['email'] = $userExist -> email;
                 $_SESSION['user_id'] = $userExist -> id;
                 $_SESSION['username'] = $userExist -> nom;
+                $_SESSION['role_name'] = $userExist -> role_name;
                 redirect('posts/index');
             } 
             else {

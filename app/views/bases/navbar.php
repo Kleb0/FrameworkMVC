@@ -14,17 +14,20 @@
           <li class="nav-item">
             <a class="nav-link" href="<?php echo URLROOT; ?>/articles/index">Les articles</a>
           </li>
-<?php if(isLoggedIn()){ ?>
-          <li class="nav-item">
-            <a class="nav-link" href="<?php echo URLROOT; ?>/posts/index">Les posts</a>            
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="<?php echo URLROOT; ?>/articlesCuration/index">Les articles à vérifier</a>
-          </li>
-          <li class="nav-item">
-            <a class ="nav-link"href="<?php echo URLROOT; ?>/usersManagement/index">Gestion des utilisateurs</a>
-          </li>
-<?php } ?>
+          <?php if(isLoggedIn()){ ?>
+                    <li class="nav-item">
+                      <a class="nav-link" href="<?php echo URLROOT; ?>/posts/index">Les posts</a>            
+                    </li>
+                    <?php if($_SESSION['role_name'] == 'administrateur'){ ?>
+                      <li class="nav-item">
+                      <a class="nav-link" href="<?php echo URLROOT; ?>/articlesCuration/index">Les articles à vérifier</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class ="nav-link"href="<?php echo URLROOT; ?>/usersManagement/index">Gestion des utilisateurs</a>
+                      </li>
+                    <?php } ?>
+
+          <?php } ?>
         </ul>
         
         <ul class="navbar-nav ms-auto">
