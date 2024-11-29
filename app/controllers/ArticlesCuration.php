@@ -7,7 +7,6 @@ class ArticlesCuration extends AbstractController {
         $this->curationModel = $this->model('ArticlesCurationModel');
     }
 
-    // Affiche la liste des articles à curer
     public function index() {
         $articlesToCurate = $this->curationModel->getArticlesToCurate();
 
@@ -19,19 +18,31 @@ class ArticlesCuration extends AbstractController {
         $this->render('index', $data);
     }
 
+    // Afficher un article à vérifier
+    public function showArticleToBeCurated() {
+        $data = [
+            'title' => 'Vérification de l\'article',
+        ];
+        $this->render('showArticleToBeCurated', $data);
+
+    }
+
     // Met à jour le statut d'un article
-    public function update($articleId) {
+    public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = htmlspecialchars($_POST['status']);
-            $adminComments = htmlspecialchars($_POST['admin_comments']);
+            $adminComments = htmlspecialchars($_POST['admin_comments'] ?? '');
 
-            if ($this->curationModel->updateCurationStatus($articleId, $status, $adminComments)) {
-                flash('curation_message', 'Article mis à jour avec succès.', 'alert alert-success');
+            if ($this->curationModel->updateCurationStatus($id, $status, $adminComments)) {
+                flash('curation_message', 'Statut mis à jour avec succès.', 'alert alert-success');
                 redirect('articlesCuration/index');
             } else {
-                flash('curation_message', 'Erreur lors de la mise à jour.', 'alert alert-danger');
+                flash('curation_message', 'Erreur lors de la mise à jour du statut.', 'alert alert-danger');
                 redirect('articlesCuration/index');
             }
+        } else {
+            redirect('articlesCuration/index');
         }
     }
 }
+
