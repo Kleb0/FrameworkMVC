@@ -3,34 +3,42 @@
 <div class="container mt-5">
     <h1 class="mb-4"><?= cleanText($data['title']); ?></h1>
 
+    <!-- Afficher l'ID de l'article à vérifier -->
+    <p>id de l'article à vérifier : <?= $data['article_id']; ?></p>
+
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title"><?= cleanText($data['article']->title); ?></h5>
+            <?php if (isset($data['article']->title)): ?>
+                <h5 class="card-title"><?= cleanText($data['article']->title); ?></h5>
+            <?php else: ?>
+                <p>Titre de l'article non défini.</p>
+            <?php endif; ?>
 
             <!-- Affichage des paragraphes -->
             <?php 
-            $paragraphTitles = json_decode($data['article']->paragraph_titles, true); 
-            $paragraphs = json_decode($data['article']->paragraphs, true); 
+                // On décode les champs JSON en tableaux
+                $paragraphTitles = json_decode($data['article']->paragraph_titles, true); 
+                $paragraphs = json_decode($data['article']->paragraphs, true); 
             ?>
 
-                <?php if ($paragraphTitles && $paragraphs): ?>
-                    <?php foreach ($paragraphTitles as $index => $title): ?>
-                        <h6><?= cleanText($title); ?></h6>
-                        <p><?= cleanText($paragraphs[$index]); ?></p>
+            <?php if ($paragraphTitles && $paragraphs): ?>
+                <?php foreach ($paragraphTitles as $index => $title): ?>
+                    <h6><?= cleanText($title); ?></h6>
+                    <p><?= cleanText($paragraphs[$index]); ?></p>
 
-                        <!-- Affichage des images -->
-                        <?php 
-                        $images = json_decode($data['article']->paragraph_images, true)[$index] ?? []; 
-                        if (!empty($images)): 
-                        ?>
-                            <div class="paragraph-images">
-                                <?php foreach ($images as $image): ?>
-                                    <img src="<?= $image ?>" alt="Image du paragraphe" class="img-fluid">
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    <!-- Affichage des images -->
+                    <?php 
+                    $images = json_decode($data['article']->paragraph_images, true)[$index] ?? []; 
+                    if (!empty($images)): 
+                    ?>
+                        <div class="paragraph-images">
+                            <?php foreach ($images as $image): ?>
+                                <img src="<?= $image ?>" alt="Image du paragraphe" class="img-fluid">
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
 
             <!-- Contenu global -->
             <div class="mt-3">
@@ -40,7 +48,7 @@
     </div>
 
     <!-- Bouton retour -->
-    <a href="<?= URLROOT ?>/articles/index" class="btn btn-primary mt-4">Retour</a>
+    <a href="<?= URLROOT ?>/articlesCuration/index" class="btn btn-primary mt-4">Retour</a>
 </div>
 
 <?php

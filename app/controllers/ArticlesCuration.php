@@ -18,16 +18,41 @@ class ArticlesCuration extends AbstractController {
         $this->render('index', $data);
     }
 
-    // Afficher un article à vérifier
-    public function showArticleToBeCurated() {
+    public function showArticleToBeCurated($id) {
+        // Vérifie que l'ID est valide
+        if (!is_numeric($id)) {
+            flash('curation_message', 'ID invalide.', 'alert alert-danger');
+            redirect('articlesCuration/index');
+        }
+    
+        $article = $this->curationModel->getArticleFromTableArticlesToPass($id);
+    
+        // if ($article) {
+        //     // Traitement de l'article récupéré
+        //     echo 'Titre de l\'article : ' . htmlspecialchars($article->title);
+        // } else {
+        //     echo 'Aucun article trouvé avec cet ID.';
+        // }
+    
+        // // Vérification du contenu de l'article
+        // echo '<pre>';
+        // var_dump($article); // Affiche les données de l'article pour déboguer
+        // echo '</pre>';
+    
+        // Prépare les données pour la vue
         $data = [
             'title' => 'Vérification de l\'article',
+            'article_id' => $id,
+            'article' => $article,  
         ];
+    
+        // Affiche la vue
         $this->render('showArticleToBeCurated', $data);
-
     }
+    
+    
+    
 
-    // Met à jour le statut d'un article
     public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = htmlspecialchars($_POST['status']);
@@ -45,4 +70,5 @@ class ArticlesCuration extends AbstractController {
         }
     }
 }
+
 
