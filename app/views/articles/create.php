@@ -43,8 +43,7 @@
         <!-- Conteneur pour le contenu global -->
         <div class="form-group mb-4">
             <label for="hidden-content-editor">Contenu de l'article</label>
-            <div id="content-editor" class="editor" style="height: 50px; border: 1px solid #ced4da;"></div>
-            <input type="hidden" name="content" id="hidden-content-editor">
+            <input type="text" id="title" name="title" class="form-control" placeholder="écrivez un résumé rapide de l'article" required>
         </div>
 
         <!-- Conteneur pour les paragraphes -->
@@ -52,7 +51,7 @@
             <!-- Paragraphe initial -->
             <div class="form-group mb-4 paragraph-block" data-id="1">
                 <label for="hidden-title-editor-1">Titre du paragraphe</label>
-                <div id="title-editor-1" class="editor-title mb-2" style="height: 50px; border: 1px solid #ced4da;"></div>
+                <div id="title-editor-1" class="editor-title mb-2"  style="height: 50px; border: 1px solid #ced4da;"></div>
                 <input type="hidden" name="paragraph_titles[]" id="hidden-title-editor-1">
                 <label for="hidden-editor-1">Contenu du paragraphe</label>
                 <div id="editor-1" class="editor" style="height: 200px; border: 1px solid #ced4da;"></div>
@@ -82,6 +81,12 @@
         [{ list: 'ordered' }, { list: 'bullet' }],
         ['link', 'image'], // Ajouter image ici
     ];
+
+    const toolbarOptionsNoImages = [
+    ['bold', 'italic', 'underline', { color: [] }, { background: [] }],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ];
+    
 
     // Fonction de gestion des images pour Quill
     function imageHandler() {
@@ -130,10 +135,7 @@
         theme: 'snow',
         modules: {
             toolbar: {
-                container: toolbarOptions,
-                handlers: {
-                    image: imageHandler, // Handler personnalisé pour les images
-                },
+                container: toolbarOptionsNoImages,
             },
         },
     });
@@ -227,10 +229,8 @@
             theme: 'snow',
             modules: {
                 toolbar: {
-                    container: toolbarOptions,
-                    handlers: {
-                        image: imageHandler, // Handler personnalisé pour les images
-                    },
+                    container: toolbarOptionsNoImages,
+
                 },
             },
         });
@@ -241,17 +241,30 @@
         });
 
         const quill = new Quill(`#editor-${newId}`, {
-            theme: 'snow',
+        theme: 'snow',
             modules: {
                 toolbar: {
                     container: toolbarOptions,
                     handlers: {
-                        image: imageHandler, // Handler personnalisé pour les images
+                        image: imageHandler, // Gestionnaire d'image
                     },
                 },
             },
         });
         editors.push({ quill: quill, hiddenInput: hiddenInput });
+
+        // Nouveau champ pour uploader des images
+        const imageUploadLabel = document.createElement('label');
+        imageUploadLabel.textContent = "Images du paragraphe";
+        const imageUploadInput = document.createElement('input');
+        imageUploadInput.type = 'file';
+        imageUploadInput.name = `paragraph_images[${newId}][]`;
+        imageUploadInput.multiple = true;
+        imageUploadInput.classList.add('form-control');
+
+        // Ajouter le champ après le contenu du paragraphe
+        newBlock.appendChild(imageUploadLabel);
+        newBlock.appendChild(imageUploadInput);
 
         quill.on('text-change', function () {
             hiddenInput.value = quill.root.innerHTML;
@@ -281,10 +294,7 @@
         theme: 'snow',
         modules: {
             toolbar: {
-                container: toolbarOptions,
-                handlers: {
-                    image: imageHandler, // Handler personnalisé pour les images
-                },
+                container: toolbarOptionsNoImages,
             },
         },
     });

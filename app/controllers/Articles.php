@@ -26,22 +26,40 @@ class Articles extends AbstractController {
 
     // Sauvegarde l'article
     public function save() {
+        if (!isset($_SESSION['user_id'])) {
+            flash('article_message', 'Vous devez être connecté pour publier un article', 'alert alert-danger');
+            redirect('users/login');
+        }
+    
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            //récupérer le prochain ID basé sur le total des articles
+            $totalArticles = $this->articleModel->countArticles();
+            $nextArticleId = $totalArticles + 1;
+
+
+
             // Extraire les images des paragraphes
-            $images = $this->extractImages(array_merge(
-                [$_POST['content']], // Inclure le contenu global
-                $_POST['paragraphs'] // Inclure tous les paragraphes
-            ));
-
+            $paragraphImages = [];
+            foreach ($_POST['paragraphs'] as $index => $paragraph) {
+                $images = $this->extractImages([$paragraph]); // Extraire les images pour chaque paragraphe
+                $paragraphImages[] = $images; // Ajouter les images extraites au tableau
+            }
+    
             $data = [
-                'user_id' => $_SESSION['user_id'], 
+                'id' => $nextArticleId,
+                'user_id' => $_SESSION['user_id'],
                 'title' => htmlspecialchars($_POST['title']),
-                'paragraph_titles' => $_POST['paragraph_titles'], 
-                'paragraphs' => $_POST['paragraphs'],             
+                'paragraph_titles' => $_POST['paragraph_titles'],
+                'paragraphs' => $_POST['paragraphs'],
+                'paragraph_images' => $paragraphImages, // Images des paragraphes
                 'content' => htmlspecialchars($_POST['content']),
-                'images' => $images, // Ajouter les images extraites
+                'images' => $this->extractImages(array_merge(
+                    [$_POST['content']], // Inclure le contenu global
+                    $_POST['paragraphs']  // Inclure tous les paragraphes
+                )),
             ];
-
+    
             if ($this->articleModel->saveArticle($data)) {
                 flash('article_message', 'Article publié avec succès', 'alert alert-success');
                 redirect('articles/index');
@@ -53,6 +71,7 @@ class Articles extends AbstractController {
             redirect('articles/create');
         }
     }
+    
 
     public function show($id) {
         // Vérifie que l'ID est un entier

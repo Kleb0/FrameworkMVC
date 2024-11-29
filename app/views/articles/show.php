@@ -13,14 +13,24 @@
             $paragraphs = json_decode($data['article']->paragraphs, true); 
             ?>
 
-            <?php if ($paragraphTitles && $paragraphs): ?>
-                <?php foreach ($paragraphTitles as $index => $title): ?>
-                    <!-- Utilisation de cleanText pour les titres -->
-                    <h6><?= cleanText($title); ?></h6>
-                    <!-- Utilisation de cleanText pour les paragraphes -->
-                    <p><?= cleanText($paragraphs[$index]); ?></p>
-                <?php endforeach; ?>
-            <?php endif; ?>
+                <?php if ($paragraphTitles && $paragraphs): ?>
+                    <?php foreach ($paragraphTitles as $index => $title): ?>
+                        <h6><?= cleanText($title); ?></h6>
+                        <p><?= cleanText($paragraphs[$index]); ?></p>
+
+                        <!-- Affichage des images -->
+                        <?php 
+                        $images = json_decode($data['article']->paragraph_images, true)[$index] ?? []; 
+                        if (!empty($images)): 
+                        ?>
+                            <div class="paragraph-images">
+                                <?php foreach ($images as $image): ?>
+                                    <img src="<?= $image ?>" alt="Image du paragraphe" class="img-fluid">
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
 
             <!-- Contenu global -->
             <div class="mt-3">
