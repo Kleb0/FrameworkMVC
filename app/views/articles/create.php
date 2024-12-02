@@ -43,7 +43,7 @@
         <!-- Conteneur pour le contenu global -->
         <div class="form-group mb-4">
             <label for="hidden-content-editor">Contenu de l'article</label>
-            <input type="text" id="title" name="title" class="form-control" placeholder="écrivez un résumé rapide de l'article" required>
+            <input type="text" id="content" name="content" class="form-control" placeholder="écrivez un résumé rapide de l'article" required>
         </div>
 
         <!-- Conteneur pour les paragraphes -->
@@ -51,13 +51,19 @@
             <!-- Paragraphe initial -->
             <div class="form-group mb-4 paragraph-block" data-id="1">
                 <label for="hidden-title-editor-1">Titre du paragraphe</label>
-                <div id="title-editor-1" class="editor-title mb-2"  style="height: 50px; border: 1px solid #ced4da;"></div>
+                <div id="title-editor-1" class="editor-title mb-2" style="height: 50px; border: 1px solid #ced4da;"></div>
                 <input type="hidden" name="paragraph_titles[]" id="hidden-title-editor-1">
+                
                 <label for="hidden-editor-1">Contenu du paragraphe</label>
                 <div id="editor-1" class="editor" style="height: 200px; border: 1px solid #ced4da;"></div>
                 <input type="hidden" name="paragraphs[]" id="hidden-editor-1">
+                
+                <!-- Champ de sélection de fichiers -->
+                <label for="paragraph-images-1">Images du paragraphe</label>
+                <input type="file" name="paragraph_images[1][]" id="paragraph-images-1" multiple class="form-control">
+
                 <!-- Bouton pour supprimer le paragraphe -->
-                <button type="button" class="btn btn-danger remove-paragraph-btn" onclick="removeParagraph(1)">Supprimer ce paragraphe</button>
+                <button type="button" class="btn btn-danger remove-paragraph-btn mt-2" onclick="removeParagraph(1)">Supprimer ce paragraphe</button>
             </div>
         </div>
 
@@ -79,7 +85,7 @@
     const toolbarOptions = [
         ['bold', 'italic', 'underline', { color: [] }, { background: [] }],
         [{ list: 'ordered' }, { list: 'bullet' }],
-        ['link', 'image'], // Ajouter image ici
+        ['link'], // Ajouter image ici
     ];
 
     const toolbarOptionsNoImages = [
@@ -90,45 +96,48 @@
 
     // Fonction de gestion des images pour Quill
     function imageHandler() {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
-        input.click();
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
 
-        input.onchange = async () => {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const base64 = e.target.result;
+    input.onchange = async () => {
+        const file = input.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('image', file);
 
-                    // Insérer l'image dans l'éditeur sous forme de base64
-                    const range = this.quill.getSelection();
-                    this.quill.insertEmbed(range.index, 'image', base64);
-                };
-                reader.readAsDataURL(file);
+            // Envoyer l'image au serveur
+            const response = await fetch('<?= URLROOT ?>/uploads/uploadImage', {
+                method: 'POST',
+                body: formData,
+            });
 
-                // Optionnel : Téléversez l'image sur le serveur pour obtenir une URL
-                // const url = await uploadImageToServer(file);
-                // const range = this.quill.getSelection();
-                // this.quill.insertEmbed(range.index, 'image', url);
+            const data = await response.json();
+            if (data.success) {
+                // Insérer l'URL retournée dans l'éditeur
+                const range = this.quill.getSelection();
+                this.quill.insertEmbed(range.index, 'image', data.url);
+            } else {
+                alert('Erreur lors de l\'upload de l\'image');
             }
-        };
-    }
+        }
+    };
+}
 
-    // Fonction pour téléverser l'image sur le serveur et obtenir une URL (optionnel)
-    async function uploadImageToServer(file) {
-        const formData = new FormData();
-        formData.append('image', file);
+    // // Fonction pour téléverser l'image sur le serveur et obtenir une URL (optionnel)
+    // async function uploadImageToServer(file) {
+    //     const formData = new FormData();
+    //     formData.append('image', file);
 
-        const response = await fetch('/upload-image-endpoint', {
-            method: 'POST',
-            body: formData,
-        });
+    //     const response = await fetch('/upload-image-endpoint', {
+    //         method: 'POST',
+    //         body: formData,
+    //     });
 
-        const data = await response.json();
-        return data.url; // Assurez-vous que le backend retourne l'URL de l'image
-    }
+    //     const data = await response.json();
+    //     return data.url; // Assurez-vous que le backend retourne l'URL de l'image
+    // }
 
     // Initialisation de Quill pour le titre du premier paragraphe
     const quillTitle1 = new Quill('#title-editor-1', {
@@ -152,7 +161,7 @@
             toolbar: {
                 container: toolbarOptions,
                 handlers: {
-                    image: imageHandler, // Handler personnalisé pour les images
+                    image: toolbarOptionsNoImages, // Handler personnalisé pour les images
                 },
             },
         },
@@ -244,10 +253,7 @@
         theme: 'snow',
             modules: {
                 toolbar: {
-                    container: toolbarOptions,
-                    handlers: {
-                        image: imageHandler, // Gestionnaire d'image
-                    },
+                    container: toolbarOptionsNoImages,
                 },
             },
         });

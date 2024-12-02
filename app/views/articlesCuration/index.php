@@ -26,7 +26,7 @@
                         <td><?= $article->submission_date; ?></td>
                         <td><?= ucfirst($article->status); ?></td>
                         <td>
-                            <a href="<?= URLROOT ?>/articlesCuration/showArticleToBeCurated/<?= $article->article_id ?>" class="btn btn-primary btn-sm">Vérifier_2</a>
+                            <a href="<?= URLROOT ?>/articlesCuration/showArticleToBeCurated/<?= $article->article_id ?>" class="btn btn-primary btn-sm">Vérifier</a>
                             <!-- <a href="<?= URLROOT ?>/curation/showcuration/<?= $article->article_id ?>" class="btn btn-primary btn-sm">Vérifier</a> -->
                         </td>
                     </tr>

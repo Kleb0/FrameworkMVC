@@ -25,6 +25,10 @@ class ArticlesModel {
         $this->db->bind(':images', json_encode($data['images']));
         $this->db->bind(':publication_date', date('Y-m-d H:i:s'));
         $this->db->bind(':has_been_curated', 0);
+
+        var_dump(json_encode($data['paragraph_titles']));
+        var_dump(json_encode($data['paragraphs']));
+        var_dump(json_encode($data['paragraph_images']));
     
         return $this->db->execute();
     }

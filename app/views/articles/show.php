@@ -1,55 +1,63 @@
 <?php require APPROOT . '/views/bases/header.php'; ?>
 
 <div class="container mt-5">
+        
     <h1 class="mb-4"><?= cleanText($data['title']); ?></h1>
-
-    <!-- Afficher l'ID de l'article à vérifier -->
-    <p>id de l'article à vérifier : <?= $data['article_id']; ?></p>
 
     <div class="card">
         <div class="card-body">
+            <!-- Titre de l'article -->
             <?php if (isset($data['article']->title)): ?>
                 <h5 class="card-title"><?= cleanText($data['article']->title); ?></h5>
             <?php else: ?>
                 <p>Titre de l'article non défini.</p>
             <?php endif; ?>
 
-            <!-- Affichage des paragraphes -->
+            <!-- Contenu global de l'article -->
+            <div class="mt-3">
+                <p><?= cleanText($data['article']->content); ?></p>
+            </div>
+
+            <hr>
+
+            <!-- Affichage des paragraphes avec leurs titres, textes et images -->
             <?php 
-                // On décode les champs JSON en tableaux
-                $paragraphTitles = json_decode($data['article']->paragraph_titles, true); 
-                $paragraphs = json_decode($data['article']->paragraphs, true); 
+                // Décodage des champs JSON en tableaux PHP
+                $paragraphTitles = json_decode($data['article']->paragraph_titles, true);
+                $paragraphs = json_decode($data['article']->paragraphs, true);
+                $paragraphImages = json_decode($data['article']->paragraph_images, true);
             ?>
 
-            <?php if ($paragraphTitles && $paragraphs): ?>
-                <?php foreach ($paragraphTitles as $index => $title): ?>
-                    <h6><?= cleanText($title); ?></h6>
-                    <p><?= cleanText($paragraphs[$index]); ?></p>
+        <?php if (!empty($paragraphTitles) && !empty($paragraphs)): ?>
+            <?php foreach ($paragraphTitles as $index => $title): ?>
+                <h4><?= cleanText($title); ?></h4>
+                <p><?= isset($paragraphs[$index]) ? cleanText($paragraphs[$index]) : 'Paragraphe manquant.'; ?></p>
 
-                    <!-- Affichage des images -->
-                    <?php 
-                    $images = json_decode($data['article']->paragraph_images, true)[$index] ?? []; 
-                    if (!empty($images)): 
-                    ?>
-                        <div class="paragraph-images">
-                            <?php foreach ($images as $image): ?>
-                                <img src="<?= $image ?>" alt="Image du paragraphe" class="img-fluid">
+                <?php if (!empty($paragraphImages[$index])): ?>
+                    <section class="paragraph-images-section mt-3">
+                        <h5>Images associées :</h5>
+                        <div class="paragraph-images mb-3">
+                            <?php foreach ($paragraphImages[$index] as $image): ?>
+                                <img src="<?= cleanText($image); ?>" alt="Image du paragraphe" class="img-fluid mb-2" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 5px;">
                             <?php endforeach; ?>
                         </div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            <?php endif; ?>
+                    </section>
+                <?php else: ?>
+                    <p>Aucune image disponible pour ce paragraphe.</p>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>Aucun contenu disponible pour les paragraphes.</p>
+        <?php endif; ?>
 
-            <!-- Contenu global -->
-            <div class="mt-3">
-                <?= cleanText($data['article']->content); ?>
-            </div>
         </div>
     </div>
 
-    <!-- Bouton retour -->
-    <a href="<?= URLROOT ?>/articlesCuration/index" class="btn btn-primary mt-4">Retour</a>
+    <!-- Bouton de retour -->
+    <a href="<?= URLROOT ?>/articles/index" class="btn btn-primary mt-4">Retour</a>
 </div>
+
+<?php require APPROOT . '/views/bases/footer.php'; ?>
 
 <?php
 // Fonction de nettoyage du texte

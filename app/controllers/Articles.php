@@ -1,5 +1,8 @@
 <?php
 
+define('UPLOAD_PATH', '/path/to/upload'); // Define the constant UPLOAD_PATH
+define('UPLOAD_URL', '/url/to/upload'); // Define the constant UPLOAD_URL
+
 class Articles extends AbstractController {
     private $articleModel;
 
@@ -26,26 +29,28 @@ class Articles extends AbstractController {
 
     // Sauvegarde l'article
     public function save() {
+        // error_log(print_r($_FILES['paragraph_images'], true));
         if (!isset($_SESSION['user_id'])) {
             flash('article_message', 'Vous devez être connecté pour publier un article', 'alert alert-danger');
             redirect('users/login');
         }
     
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-            //récupérer le prochain ID basé sur le total des articles
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
+        {
+    
             $totalArticles = $this->articleModel->countArticles();
             $nextArticleId = $totalArticles + 1;
-
-
-
-            // Extraire les images des paragraphes
+    
+            // Gestion des uploads d'images
             $paragraphImages = [];
-            foreach ($_POST['paragraphs'] as $index => $paragraph) {
-                $images = $this->extractImages([$paragraph]); // Extraire les images pour chaque paragraphe
-                $paragraphImages[] = $images; // Ajouter les images extraites au tableau
+            if (!empty($_FILES['paragraph_images']))
+            {
+                foreach ($_FILES['paragraph_images']['name'] as $index => $files) {
+                    $paragraphImages[$index] = $this->handleUploadedImages($_FILES['paragraph_images'], $index);
+                }
             }
     
+            // Préparation des données
             $data = [
                 'id' => $nextArticleId,
                 'user_id' => $_SESSION['user_id'],
@@ -55,27 +60,54 @@ class Articles extends AbstractController {
                 'paragraph_images' => $paragraphImages, // Images des paragraphes
                 'content' => htmlspecialchars($_POST['content']),
                 'images' => $this->extractImages(array_merge(
-                    [$_POST['content']], // Inclure le contenu global
-                    $_POST['paragraphs']  // Inclure tous les paragraphes
+                    [$_POST['content']],
+                    $_POST['paragraphs']
                 )),
             ];
     
-            if ($this->articleModel->saveArticle($data)) {
-
-                // Transfère l'article dans la table articles_to_be_curated
+            // Enregistrement en base
+            if ($this->articleModel->saveArticle($data)) 
+            {
+                // Transfert pour curation
                 $this->articleModel->transferToCuration($nextArticleId, $_SESSION['user_id']);
-
-                
-                flash('article_message', 'Article publié avec succès', 'alert alert-success');
+    
+                flash('article_message', 'Article Envoyé', 'alert alert-success');
                 redirect('articles/index');
-            } else {
+            } 
+            else
+            {
                 flash('article_message', 'Erreur lors de la publication de l\'article', 'alert alert-danger');
                 $this->render('create', $data);
             }
-        } else {
+        } 
+        else {
             redirect('articles/create');
         }
     }
+
+    private function handleUploadedImages($files, $index) {
+    $uploadedImages = [];
+
+    if (isset($files['tmp_name'][$index])) {
+        foreach ($files['tmp_name'][$index] as $key => $tmpName) {
+            if ($files['error'][$index][$key] === UPLOAD_ERR_OK) {
+                // Générer un nom unique pour chaque fichier
+                $filename = uniqid() . '_' . basename($files['name'][$index][$key]);
+                $destination = UPLOAD_PATH . '/' . $filename;
+
+                // Déplacer le fichier vers le dossier de destination
+                if (move_uploaded_file($tmpName, $destination)) {
+                    // Ajouter l'URL relative de l'image dans la liste
+                    $uploadedImages[] = UPLOAD_URL . '/' . $filename;
+                }
+            }
+        }
+    }
+
+    return $uploadedImages;
+}
+
+
     
 
     public function show($id) {

@@ -12,24 +12,26 @@
     <!-- Liste des articles -->
     <?php if (!empty($data['articles'])): ?>
         <?php foreach ($data['articles'] as $article): ?>
-            <div class="card mb-3">
-                <div class="card-body">
-                    <!-- Titre de l'article -->
-                    <h5 class="card-title"><?= cleanText($article->title); ?></h5>
+            <?php if ($article->has_been_curated == 1): ?>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <!-- Titre de l'article -->
+                        <h5 class="card-title"><?= cleanText($article->title); ?></h5>
 
-                    <!-- Affichage du premier titre de paragraphe (décodé et nettoyé) -->
-                    <?php 
-                    $paragraphTitles = json_decode($article->paragraph_titles, true); 
-                    $previewTitle = $paragraphTitles[0] ?? ''; // Récupère le premier titre s'il existe
-                    ?>
-                    <p class="card-text">
-                        <?= cleanText($previewTitle); ?>
-                    </p>
+                        <!-- Affichage du premier titre de paragraphe (décodé et nettoyé) -->
+                        <?php 
+                        $paragraphTitles = json_decode($article->paragraph_titles, true); 
+                        $previewTitle = $paragraphTitles[0] ?? ''; // Récupère le premier titre s'il existe
+                        ?>
+                        <p class="card-text">
+                            <?= cleanText($previewTitle); ?>
+                        </p>
 
-                    <!-- Bouton Lire plus -->
-                    <a href="<?= URLROOT ?>/articles/show/<?= $article->id ?>" class="btn btn-secondary">Lire plus</a>
+                        <!-- Bouton Lire plus -->
+                        <a href="<?= URLROOT ?>/articles/show/<?= $article->id ?>" class="btn btn-secondary">Lire plus</a>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         <?php endforeach; ?>
     <?php else: ?>
         <p>Aucun article disponible.</p>
