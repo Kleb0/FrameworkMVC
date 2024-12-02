@@ -56,5 +56,12 @@ class ArticlesModel {
         $this->db->bind(':id', $id);
         return $this->db->findOne();
     }
+
+    public function updateHasBeenCurated($articleID) 
+    {
+        $this->db->query('UPDATE articles SET has_been_curated = 1 WHERE id = :id');
+        $this->db->bind(':id', $articleID);
+        return $this->db->execute();
+    }
     
 }

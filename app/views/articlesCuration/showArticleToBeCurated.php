@@ -47,10 +47,19 @@
                 <?php endforeach; ?>
             <?php endif; ?>
 
+
             <!-- Affichage du contenu global -->
             <div class="mt-3">
                 <?= cleanText($data['article']->content); ?>
             </div>
+
+            <!-- bouton de validation -->
+            <form action="<?= URLROOT ?>/articlesCuration/validateArticle" method="post">
+                <input type="hidden" name="article_id" value="<?= $data['article_id']; ?>">
+                <button type="submit" class="btn btn-success mt-3">Valider l'article</button>
+            </form>
+
+
         </div>
     </div>
 

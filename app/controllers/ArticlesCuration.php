@@ -5,6 +5,7 @@ class ArticlesCuration extends AbstractController {
 
     public function __construct() {
         $this->curationModel = $this->model('ArticlesCurationModel');
+        $this->articleModel = $this->model('ArticlesModel');
     }
 
     public function index() {
@@ -49,6 +50,37 @@ class ArticlesCuration extends AbstractController {
         // Affiche la vue
         $this->render('showArticleToBeCurated', $data);
     }
+
+    public function validateArticle() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Récupérer l'ID de l'article depuis le formulaire
+        $articleId = intval($_POST['article_id']);
+
+        // Mettre à jour le statut de l'article dans 'articles_to_be_curated'
+        if ($this->curationModel->updateCurationStatus($articleId, 'approved')) 
+        {
+            // Mettre à jour la colonne has_been_curated dans 'articles'
+            if ($this->articleModel->updateHasBeenCurated($articleId)) 
+            {
+                flash('curation_message', 'Article validé avec succès.', 'alert alert-success');
+            } 
+            else
+            {
+                flash('curation_message', 'Erreur lors de la mise à jour de l\'article.', 'alert alert-danger');
+            }
+        } 
+        else
+        {
+            flash('curation_message', 'Erreur lors de la validation de la curation.', 'alert alert-danger');
+        }
+
+        // Rediriger vers la page de curation
+        redirect('articlesCuration/index');
+    } else {
+        redirect('articlesCuration/index');
+    }
+}
+
     
     
     
