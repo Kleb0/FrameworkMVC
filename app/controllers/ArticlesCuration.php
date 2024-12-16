@@ -74,9 +74,10 @@ class ArticlesCuration extends AbstractController {
             flash('curation_message', 'Erreur lors de la validation de la curation.', 'alert alert-danger');
         }
 
-        // Rediriger vers la page de curation
         redirect('articlesCuration/index');
-    } else {
+    } 
+    else
+    {
         redirect('articlesCuration/index');
     }
 }

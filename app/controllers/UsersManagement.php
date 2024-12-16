@@ -12,7 +12,8 @@ class UsersManagement extends AbstractController {
         $users = $this->usersManagementModel->getAllUsers();
 
         
-        if (!$users) {
+        if (!$users) 
+        {
             die("Erreur : Aucun utilisateur trouvé ou problème de récupération des données.");
         }
 

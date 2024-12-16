@@ -30,7 +30,8 @@ class Articles extends AbstractController {
     // Sauvegarde l'article
     public function save() {
         // error_log(print_r($_FILES['paragraph_images'], true));
-        if (!isset($_SESSION['user_id'])) {
+        if (!isset($_SESSION['user_id']))
+         {
             flash('article_message', 'Vous devez être connecté pour publier un article', 'alert alert-danger');
             redirect('users/login');
         }
@@ -45,7 +46,8 @@ class Articles extends AbstractController {
             $paragraphImages = [];
             if (!empty($_FILES['paragraph_images']))
             {
-                foreach ($_FILES['paragraph_images']['name'] as $index => $files) {
+                foreach ($_FILES['paragraph_images']['name'] as $index => $files)
+                {
                     $paragraphImages[$index] = $this->handleUploadedImages($_FILES['paragraph_images'], $index);
                 }
             }
@@ -88,15 +90,19 @@ class Articles extends AbstractController {
     private function handleUploadedImages($files, $index) {
     $uploadedImages = [];
 
-    if (isset($files['tmp_name'][$index])) {
-        foreach ($files['tmp_name'][$index] as $key => $tmpName) {
-            if ($files['error'][$index][$key] === UPLOAD_ERR_OK) {
+    if (isset($files['tmp_name'][$index]))
+    {
+        foreach ($files['tmp_name'][$index] as $key => $tmpName) 
+        {
+            if ($files['error'][$index][$key] === UPLOAD_ERR_OK) 
+            {
                 // Générer un nom unique pour chaque fichier
                 $filename = uniqid() . '_' . basename($files['name'][$index][$key]);
                 $destination = UPLOAD_PATH . '/' . $filename;
 
                 // Déplacer le fichier vers le dossier de destination
-                if (move_uploaded_file($tmpName, $destination)) {
+                if (move_uploaded_file($tmpName, $destination))
+                {
                     // Ajouter l'URL relative de l'image dans la liste
                     $uploadedImages[] = UPLOAD_URL . '/' . $filename;
                 }

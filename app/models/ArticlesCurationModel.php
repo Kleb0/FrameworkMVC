@@ -19,7 +19,8 @@ class ArticlesCurationModel {
         $this->db->bind(':id', $id);
         $article = $this->db->findOne();
     
-        if ($article) {
+        if ($article) 
+        {
             // Décoder les champs JSON si présents
             $article->paragraph_titles = isset($article->paragraph_titles) ? json_decode($article->paragraph_titles, true) : [];
             $article->paragraphs = isset($article->paragraphs) ? json_decode($article->paragraphs, true) : [];
